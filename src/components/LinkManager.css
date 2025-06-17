@@ -1,0 +1,86 @@
+.link-manager {
+  background-color: white;
+  border-radius: 8px;
+  padding: 2rem;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.add-link-form {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+.add-link-form input {
+  flex: 1;
+  min-width: 200px;
+}
+
+.links-container {
+  margin-top: 1.5rem;
+}
+
+.category-section {
+  margin-bottom: 2rem;
+}
+
+.category-section h3 {
+  color: #2c3e50;
+  border-bottom: 2px solid #ecf0f1;
+  padding-bottom: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.links-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.link-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.75rem 1rem;
+  background-color: #f8f9fa;
+  border-radius: 4px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.link-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.link-info a {
+  color: #3498db;
+  text-decoration: none;
+  font-weight: 500;
+  margin-bottom: 0.25rem;
+}
+
+.link-info a:hover {
+  text-decoration: underline;
+}
+
+.link-date {
+  font-size: 0.8rem;
+  color: #95a5a6;
+}
+
+.no-links {
+  text-align: center;
+  color: #7f8c8d;
+  margin-top: 2rem;
+}
+
+.delete-btn {
+  background-color: #e74c3c;
+  font-size: 0.9rem;
+  padding: 0.4rem 0.8rem;
+}
+
+.delete-btn:hover {
+  background-color: #c0392b;
+}

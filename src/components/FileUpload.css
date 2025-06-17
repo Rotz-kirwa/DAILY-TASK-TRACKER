@@ -1,0 +1,90 @@
+.file-upload {
+  padding: 1rem;
+}
+
+.upload-section {
+  margin-bottom: 1.5rem;
+}
+
+.file-preview {
+  margin-bottom: 1.5rem;
+  padding: 0.5rem;
+  background-color: #f8f9fa;
+  border-radius: 4px;
+}
+
+.file-list ul {
+  list-style: none;
+  padding: 0;
+}
+
+.file-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem;
+  margin-bottom: 1rem;
+  background-color: #f8f9fa;
+  border-radius: 4px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.file-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.file-meta {
+  font-size: 0.8rem;
+  color: #7f8c8d;
+  margin-top: 0.25rem;
+}
+
+.file-actions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.storage-indicator {
+  margin: 1rem 0;
+}
+
+.storage-bar {
+  height: 10px;
+  background-color: #ecf0f1;
+  border-radius: 5px;
+  overflow: hidden;
+}
+
+.storage-used {
+  height: 100%;
+  transition: width 0.3s ease;
+}
+
+.storage-text {
+  font-size: 0.8rem;
+  color: #7f8c8d;
+  margin-top: 0.25rem;
+  text-align: right;
+}
+
+.storage-info {
+  background-color: #f8f9fa;
+  padding: 1rem;
+  border-radius: 4px;
+  margin-bottom: 1rem;
+}
+
+.storage-note {
+  font-size: 0.8rem;
+  color: #e74c3c;
+  font-style: italic;
+}
+
+.error-message {
+  color: #e74c3c;
+  padding: 0.5rem;
+  margin-bottom: 1rem;
+  background-color: #fadbd8;
+  border-radius: 4px;
+}
