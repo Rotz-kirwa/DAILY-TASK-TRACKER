@@ -1,12 +1,14 @@
 import React, { useState, useEffect, useRef } from 'react';
+import useAlarm from '../hooks/useAlarm';
 
 const RemindersPage = () => {
   const [reminders, setReminders] = useState([]);
   const [title, setTitle] = useState('');
   const [date, setDate] = useState('');
+  const [isDaily, setIsDaily] = useState(false);
   const [soundEnabled, setSoundEnabled] = useState(true);
-  const audioRef = useRef(null);
   const checkInterval = useRef(null);
+  const { playAlarm, stopAlarm, isAlarmPlaying, changeMusic } = useAlarm();
 
   // Load reminders from localStorage
   useEffect(() => {
@@ -18,10 +20,6 @@ const RemindersPage = () => {
     if (soundPref !== null) {
       setSoundEnabled(soundPref === 'true');
     }
-    
-    // Create audio element
-    audioRef.current = new Audio('/sounds/notification.mp3');
-    audioRef.current.src = 'https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3';
     
     return () => {
       if (checkInterval.current) {
@@ -53,10 +51,28 @@ const RemindersPage = () => {
       if (reminder.completed) return false;
       
       const reminderDate = new Date(reminder.date);
-      const timeDiff = Math.abs(now - reminderDate);
       
-      // If the reminder is due within the last minute
-      return timeDiff < 60000 && reminderDate <= now;
+      if (reminder.isDaily) {
+        // For daily reminders, check if it's due today and not completed today
+        const lastCompleted = reminder.lastCompleted ? new Date(reminder.lastCompleted) : null;
+        
+        // Check if the time matches (hour and minute)
+        const timeMatches = 
+          reminderDate.getHours() === now.getHours() && 
+          reminderDate.getMinutes() === now.getMinutes();
+        
+        // Check if it was already completed today
+        const completedToday = lastCompleted && 
+          lastCompleted.getDate() === now.getDate() &&
+          lastCompleted.getMonth() === now.getMonth() &&
+          lastCompleted.getFullYear() === now.getFullYear();
+        
+        return timeMatches && !completedToday;
+      } else {
+        // For regular reminders, check if it's due within the last minute
+        const timeDiff = Math.abs(now - reminderDate);
+        return timeDiff < 60000 && reminderDate <= now;
+      }
     });
     
     if (dueReminders.length > 0) {
@@ -66,10 +82,7 @@ const RemindersPage = () => {
   };
 
   const playNotificationSound = () => {
-    if (audioRef.current) {
-      audioRef.current.currentTime = 0;
-      audioRef.current.play().catch(e => console.log('Error playing sound:', e));
-    }
+    playAlarm();
   };
 
   const showNotification = (dueReminders) => {
@@ -90,7 +103,9 @@ const RemindersPage = () => {
         id: Date.now(),
         title,
         date,
+        isDaily,
         completed: false,
+        lastCompleted: null,
         createdAt: new Date().toLocaleString()
       };
       
@@ -100,13 +115,30 @@ const RemindersPage = () => {
       
       setTitle('');
       setDate('');
+      setIsDaily(false);
     }
   };
 
   const toggleComplete = (id) => {
-    const updatedReminders = reminders.map(reminder => 
-      reminder.id === id ? { ...reminder, completed: !reminder.completed } : reminder
-    );
+    const now = new Date();
+    
+    const updatedReminders = reminders.map(reminder => {
+      if (reminder.id === id) {
+        if (reminder.isDaily) {
+          // For daily reminders, just update lastCompleted instead of marking as completed
+          return { 
+            ...reminder, 
+            lastCompleted: now.toISOString(),
+            completed: false // Keep it active
+          };
+        } else {
+          // For regular reminders, toggle completed status
+          return { ...reminder, completed: !reminder.completed };
+        }
+      }
+      return reminder;
+    });
+    
     setReminders(updatedReminders);
     localStorage.setItem('savedReminders', JSON.stringify(updatedReminders));
   };
@@ -163,11 +195,33 @@ const RemindersPage = () => {
           Enable browser notifications
         </button>
         <button 
-          onClick={playNotificationSound}
+          onClick={playAlarm}
           style={{ marginLeft: '1rem' }}
         >
           Test sound
         </button>
+        {isAlarmPlaying() && (
+          <>
+            <button 
+              onClick={stopAlarm}
+              style={{ 
+                marginLeft: '1rem',
+                backgroundColor: '#e74c3c'
+              }}
+            >
+              Stop Alarm
+            </button>
+            <button 
+              onClick={changeMusic}
+              style={{ 
+                marginLeft: '1rem',
+                backgroundColor: '#3498db'
+              }}
+            >
+              Change Music
+            </button>
+          </>
+        )}
       </div>
       
       <div>
@@ -182,6 +236,21 @@ const RemindersPage = () => {
           value={date}
           onChange={(e) => setDate(e.target.value)}
         />
+        <div style={{ margin: '0.5rem 0' }}>
+          <label>
+            <input 
+              type="checkbox" 
+              checked={isDaily} 
+              onChange={() => setIsDaily(!isDaily)} 
+            />
+            Daily recurring reminder
+          </label>
+          {isDaily && (
+            <span style={{ marginLeft: '0.5rem', fontSize: '0.9rem', color: '#7f8c8d' }}>
+              (Will repeat daily at the specified time)
+            </span>
+          )}
+        </div>
         <button onClick={handleSave}>Add Reminder</button>
       </div>
       
@@ -200,6 +269,7 @@ const RemindersPage = () => {
                 style={{ 
                   opacity: reminder.completed ? 0.7 : 1,
                   borderLeft: reminder.completed ? '4px solid #2ecc71' : 
+                             reminder.isDaily ? '4px solid #9b59b6' :
                              isPast ? '4px solid #e74c3c' : '4px solid #3498db'
                 }}
               >
@@ -219,7 +289,7 @@ const RemindersPage = () => {
                     >
                       {reminder.title}
                     </span>
-                    {isPast && !reminder.completed && (
+                    {isPast && !reminder.completed && !reminder.isDaily && (
                       <span style={{ 
                         color: 'white', 
                         background: '#e74c3c',
@@ -231,10 +301,35 @@ const RemindersPage = () => {
                         OVERDUE
                       </span>
                     )}
+                    {reminder.isDaily && (
+                      <span style={{ 
+                        color: 'white', 
+                        background: '#9b59b6',
+                        padding: '2px 6px',
+                        borderRadius: '3px',
+                        fontSize: '0.7rem',
+                        marginLeft: '8px'
+                      }}>
+                        DAILY
+                      </span>
+                    )}
                   </div>
                   <button className="delete-btn" onClick={() => handleDelete(reminder.id)}>Delete</button>
                 </div>
-                <div className="item-date">Due: {new Date(reminder.date).toLocaleString()}</div>
+                <div className="item-date">
+                  {reminder.isDaily ? (
+                    <>
+                      <span>Daily at {new Date(reminder.date).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</span>
+                      {reminder.lastCompleted && (
+                        <span style={{ marginLeft: '0.5rem', fontSize: '0.8rem', color: '#7f8c8d' }}>
+                          (Last completed: {new Date(reminder.lastCompleted).toLocaleDateString()})
+                        </span>
+                      )}
+                    </>
+                  ) : (
+                    <>Due: {new Date(reminder.date).toLocaleString()}</>
+                  )}
+                </div>
               </div>
             );
           })

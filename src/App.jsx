@@ -7,16 +7,13 @@ import PhotosPage from './pages/PhotosPage'
 import RemindersPage from './pages/RemindersPage'
 import ProjectsPage from './pages/ProjectsPage'
 import NotesPage from './pages/NotesPage'
+import useAlarm from './hooks/useAlarm'
 
 function App() {
-  const audioRef = useRef(null);
   const checkInterval = useRef(null);
+  const { playAlarm, stopAlarm, isAlarmPlaying } = useAlarm();
 
   useEffect(() => {
-    // Create audio element for global reminders
-    audioRef.current = new Audio();
-    audioRef.current.src = 'https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3';
-    
     // Set up global reminder checking
     checkInterval.current = setInterval(checkReminders, 60000); // Check every minute
     
@@ -45,15 +42,12 @@ function App() {
     });
     
     if (dueReminders.length > 0) {
-      playNotificationSound();
+      // Store active reminders in localStorage to track them
+      localStorage.setItem('activeReminders', JSON.stringify(dueReminders));
+      
+      // Play alarm sound for 10 minutes
+      playAlarm();
       showNotification(dueReminders);
-    }
-  };
-
-  const playNotificationSound = () => {
-    if (audioRef.current) {
-      audioRef.current.currentTime = 0;
-      audioRef.current.play().catch(e => console.log('Error playing sound:', e));
     }
   };
 
