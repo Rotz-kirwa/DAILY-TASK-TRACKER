@@ -7,6 +7,7 @@ A web application for managing personal files, links, photos, project ideas, and
 - **File Manager**: Upload and store files from your computer
 - **Link Manager**: Save and organize important links
 - **Photo Gallery**: Upload and view your photos
+- **Notes**: Take and organize personal notes with search functionality
 - **Project Ideas**: Write and save your project concepts
 - **Reminders**: Set reminders with sound notifications
 
@@ -61,6 +62,11 @@ npm run dev
 - Upload photos from your computer
 - View photos in a gallery format
 - Delete photos when no longer needed
+
+### Notes
+- Take and save personal notes with titles and content
+- Search through your notes with the search function
+- Edit notes as needed and track changes
 
 ### Project Ideas
 - Write down project concepts with titles and descriptions
