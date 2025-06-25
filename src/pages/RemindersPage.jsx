@@ -8,7 +8,7 @@ const RemindersPage = () => {
   const [isDaily, setIsDaily] = useState(false);
   const [soundEnabled, setSoundEnabled] = useState(true);
   const checkInterval = useRef(null);
-  const { playAlarm, stopAlarm, isAlarmPlaying, changeMusic } = useAlarm();
+  const { playAlarm, stopAlarm, isAlarmPlaying, changeMusic, getCurrentSoundName } = useAlarm();
 
   // Load reminders from localStorage
   useEffect(() => {
@@ -218,7 +218,7 @@ const RemindersPage = () => {
                 backgroundColor: '#3498db'
               }}
             >
-              Change Music
+              Change Music ({getCurrentSoundName()})
             </button>
           </>
         )}

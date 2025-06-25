@@ -59,7 +59,7 @@ const FilesPage = () => {
   };
 
   return (
-    <div className="page-container">
+    <div className="page-container background-image">
       <h2>File Manager</h2>
       
       <div>

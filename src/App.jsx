@@ -4,16 +4,21 @@ import './App.css'
 import FilesPage from './pages/FilesPage'
 import LinksPage from './pages/LinksPage'
 import PhotosPage from './pages/PhotosPage'
+import VideosPage from './pages/VideosPage'
 import RemindersPage from './pages/RemindersPage'
 import ProjectsPage from './pages/ProjectsPage'
 import NotesPage from './pages/NotesPage'
-import useAlarm from './hooks/useAlarm'
+import Footer from './components/Footer'
 
 function App() {
+  const audioRef = useRef(null);
   const checkInterval = useRef(null);
-  const { playAlarm, stopAlarm, isAlarmPlaying } = useAlarm();
 
   useEffect(() => {
+    // Create audio element for global reminders
+    audioRef.current = new Audio();
+    audioRef.current.src = 'https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3';
+    
     // Set up global reminder checking
     checkInterval.current = setInterval(checkReminders, 60000); // Check every minute
     
@@ -42,12 +47,15 @@ function App() {
     });
     
     if (dueReminders.length > 0) {
-      // Store active reminders in localStorage to track them
-      localStorage.setItem('activeReminders', JSON.stringify(dueReminders));
-      
-      // Play alarm sound for 10 minutes
-      playAlarm();
+      playNotificationSound();
       showNotification(dueReminders);
+    }
+  };
+
+  const playNotificationSound = () => {
+    if (audioRef.current) {
+      audioRef.current.currentTime = 0;
+      audioRef.current.play().catch(e => console.log('Error playing sound:', e));
     }
   };
 
@@ -71,6 +79,7 @@ function App() {
             <li><Link to="/files">Files</Link></li>
             <li><Link to="/links">Links</Link></li>
             <li><Link to="/photos">Photos</Link></li>
+            <li><Link to="/videos">Videos</Link></li>
             <li><Link to="/notes">Notes</Link></li>
             <li><Link to="/projects">Projects</Link></li>
             <li><Link to="/reminders">Reminders</Link></li>
@@ -82,17 +91,20 @@ function App() {
             <Route path="/files" element={<FilesPage />} />
             <Route path="/links" element={<LinksPage />} />
             <Route path="/photos" element={<PhotosPage />} />
+            <Route path="/videos" element={<VideosPage />} />
             <Route path="/notes" element={<NotesPage />} />
             <Route path="/projects" element={<ProjectsPage />} />
             <Route path="/reminders" element={<RemindersPage />} />
             <Route path="/" element={
               <div className="welcome">
                 <h1>BE THE BEST VERSION OF YOU</h1>
-                <p>Store your files, links, photos, notes, project ideas, and set reminders all in one place!</p>
+                <p>Store your files, links, photos, videos, notes, project ideas, and set reminders all in one place!</p>
               </div>
             } />
           </Routes>
         </main>
+        
+        <Footer />
       </div>
     </BrowserRouter>
   )
